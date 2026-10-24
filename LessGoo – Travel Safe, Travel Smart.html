@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LessGoo – Travel Safe, Travel Smart</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧭</text></svg>">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<style>
+:root{color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{background:#0b1426;color:#e2e8f0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.card{background:#111d36;border:1px solid #1e2d4d;border-radius:16px}
+.btn{padding:.55rem 1rem;border-radius:10px;font-weight:600;transition:.15s}
+.btn-em{background:#10b981;color:#052e22}.btn-em:hover{background:#34d399}
+.btn-ghost{background:#1b2a4a}.btn-ghost:hover{background:#26396a}
+input,select{background:#0b1426;border:1px solid #2a3b61;border-radius:10px;padding:.55rem .8rem;width:100%;color:#e2e8f0}
+.sos{animation:pulse 1.8s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(239,68,68,.7)}70%{box-shadow:0 0 0 18px rgba(239,68,68,0)}100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}}
+.hide{display:none!important}
+.tab.on{background:#10b981;color:#052e22}
+</style>
+</head>
+<body>
+<!-- OFFLINE BANNER -->
+<div id="offBanner" class="hide bg-amber-500 text-black text-center text-sm font-semibold py-1">📴 Offline Mode – showing cached emergency data only</div>
+
+<!-- HEADER -->
+<header class="flex items-center justify-between px-4 md:px-8 py-3 border-b border-slate-800 sticky top-0 bg-[#0b1426]/95 z-30">
+  <div class="text-xl font-extrabold">Less<span class="text-emerald-400">Goo</span> <span class="text-xs font-normal text-slate-400 hidden sm:inline">travel without worry</span></div>
+  <div class="flex items-center gap-2 text-sm">
+    <label class="flex items-center gap-2 cursor-pointer"><span class="hidden sm:inline">Offline</span>
+      <input id="offToggle" type="checkbox" class="w-5 h-5 accent-emerald-500" style="width:auto"></label>
+    <button class="btn btn-ghost" onclick="openM('premium')">⭐ Premium</button>
+  </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 py-6 space-y-8">
+
+<!-- 1. HERO & SEARCH -->
+<section>
+  <h1 class="text-3xl md:text-5xl font-extrabold leading-tight">Go further. <span class="text-emerald-400">Stay safer.</span></h1>
+  <p class="text-slate-400 mt-2 max-w-xl">Live hazard checks, verified prices and family-grade tracking for every journey.</p>
+  <div class="card p-4 mt-4 grid gap-3 md:grid-cols-5">
+    <select id="from"></select><select id="to"></select>
+    <select id="who"><option>Solo traveler</option><option>Group</option><option>Unaccompanied minor</option></select>
+    <input id="date" type="date">
+    <button class="btn btn-em" onclick="planTrip()">Plan safe route</button>
+  </div>
+  <div id="planOut" class="hide mt-4 grid gap-4 lg:grid-cols-3"></div>
+</section>
+
+<!-- 3. GUARDIAN SHIELD -->
+<section id="guardian">
+  <h2 class="text-2xl font-bold mb-3">🛡️ Guardian Shield</h2>
+  <div class="grid gap-4 md:grid-cols-2">
+    <div class="card p-4 space-y-3">
+      <div class="flex justify-between items-center"><div><div class="font-semibold">Traveler: Aarav (12)</div><div class="text-xs text-slate-400">Chandigarh → Shimla · Cab HP-01-4521</div></div>
+        <span id="gStatus" class="text-xs px-2 py-1 rounded-full bg-slate-700">Not tracking</span></div>
+      <div class="flex gap-2"><select id="gInt"><option value="30">Check-in every 30 min</option><option value="45">Every 45 min</option><option value="60">Every 60 min</option></select>
+        <button class="btn btn-em whitespace-nowrap" id="gBtn" onclick="toggleGuard()">Start</button></div>
+      <p class="text-xs text-slate-400">Demo speed: 30 min is simulated as 3 seconds.</p>
+      <div id="gLog" class="text-sm space-y-1 max-h-40 overflow-auto"></div>
+      <button class="btn bg-red-600 hover:bg-red-500 w-full" onclick="phoneOff()">Simulate: phone switched off</button>
+    </div>
+    <div id="failsafe" class="card p-4 border-red-500/50">
+      <div class="font-semibold text-red-400">🚨 Fail-Safe Protocol</div>
+      <p id="fsMsg" class="text-sm text-slate-400 mt-1">Activates automatically if the traveler is unreachable. One-click contacts appear here.</p>
+      <div id="fsBtns" class="hide mt-3 space-y-2">
+        <button class="btn btn-ghost w-full text-left" onclick="callSim('Hotel Snow View reception','+91 177 255 0000')">🏨 Hotel reception — Snow View, Shimla</button>
+        <button class="btn btn-ghost w-full text-left" onclick="callSim('Driver Rajinder (verified)','+91 98xxx 12345')">🚖 Verified driver — Rajinder S.</button>
+        <button class="btn btn-ghost w-full text-left" onclick="callSim('Emergency contact – Uncle Vikram','+91 99xxx 55555')">👤 Emergency contact — Uncle Vikram</button>
+        <button class="btn bg-red-600 w-full text-left" onclick="openM('sos')">🆘 Escalate to SOS</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. BOOKING -->
+<section>
+  <h2 class="text-2xl font-bold mb-3">🧾 Book everything in one place</h2>
+  <div id="tabs" class="flex flex-wrap gap-2 mb-3"></div>
+  <div id="bookList" class="grid gap-3 md:grid-cols-3"></div>
+</section>
+
+<!-- 4. COMMUNITY -->
+<section>
+  <h2 class="text-2xl font-bold mb-3">🧭 Community Wisdom</h2>
+  <input id="q" placeholder="Search itineraries, e.g. Shimla, Manali, landslide…" oninput="renderComm()">
+  <div id="comm" class="grid gap-3 md:grid-cols-2 mt-3"></div>
+</section>
+
+<!-- 7. OFFLINE -->
+<section id="offPanel" class="card p-4">
+  <h2 class="text-2xl font-bold mb-2">📴 Offline Emergency Cache</h2>
+  <p class="text-sm text-slate-400 mb-3">Saved on your device for zero-network zones. <span id="cacheStat" class="text-emerald-400">Synced 2 min ago</span></p>
+  <div class="grid gap-3 md:grid-cols-3">
+    <div class="rounded-xl bg-[#0b1426] p-3"><div class="font-semibold">🗺️ Emergency maps</div><div class="text-sm text-slate-400">Kalka–Shimla NH-5 · shelters, hospitals, helipads (14 MB)</div></div>
+    <div class="rounded-xl bg-[#0b1426] p-3"><div class="font-semibold">📇 Contact cards</div><div class="text-sm text-slate-400">112 · 108 Ambulance · 100 Police · 1078 NDMA</div></div>
+    <div class="rounded-xl bg-[#0b1426] p-3"><div class="font-semibold">🛣️ Cached routes</div><div class="text-sm text-slate-400">3 routes with last known hazard status</div></div>
+  </div>
+  <button class="btn btn-ghost mt-3" onclick="syncCache()">⟳ Sync now (Premium)</button>
+</section>
+</main>
+
+<footer class="text-center text-xs text-slate-500 py-8 px-4">LessGoo demo · all data is mocked · no real alerts or bookings are sent. In a real emergency dial 112.</footer>
+
+<!-- SOS FLOATING BUTTON -->
+<button class="sos fixed left-4 bottom-4 z-40 w-16 h-16 rounded-full bg-red-600 text-white font-extrabold text-sm" style="bottom:calc(1rem + env(safe-area-inset-bottom,0px))" onclick="openM('sos')" aria-label="Instant SOS">SOS</button>
+
+<!-- CHAT WIDGET -->
+<button class="fixed right-4 z-40 w-14 h-14 rounded-full bg-emerald-500 text-2xl" style="bottom:calc(1rem + env(safe-area-inset-bottom,0px))" onclick="toggleChat()" aria-label="Chat">💬</button>
+<div id="chat" class="hide fixed right-4 z-40 w-[22rem] max-w-[calc(100vw-2rem)] card flex flex-col" style="bottom:calc(5rem + env(safe-area-inset-bottom,0px));height:26rem">
+  <div class="p-3 border-b border-slate-700 font-semibold">🤖 LessGoo Assistant</div>
+  <div id="chatLog" class="flex-1 overflow-auto p-3 space-y-2 text-sm"></div>
+  <div class="p-2 flex gap-2"><input id="chatIn" placeholder="Ask about routes, safety…" onkeydown="if(event.key==='Enter')sendChat()"><button class="btn btn-em" onclick="sendChat()">Send</button></div>
+</div>
+
+<!-- MODALS -->
+<div id="m-sos" class="hide fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
+  <div class="card p-5 w-full max-w-md border-red-500">
+    <div class="flex justify-between"><h3 class="text-xl font-bold text-red-400">🆘 Instant SOS / Disaster Alert</h3><button onclick="closeM('sos')">✕</button></div>
+    <div id="sosForm" class="mt-3 space-y-3">
+      <select id="sosType"><option>Flood</option><option>Landslide</option><option>Earthquake</option><option>Medical emergency</option><option>Road accident</option></select>
+      <p class="text-xs text-slate-400">Sends your GPS location to SDRF/NDRF, nearest police, hospitals and registered NGOs.</p>
+      <button class="btn bg-red-600 hover:bg-red-500 w-full text-lg py-3" onclick="fireSOS()">SEND ALERT NOW</button>
+    </div>
+    <div id="sosOut" class="hide mt-3 text-sm space-y-2"></div>
+  </div>
+</div>
+<div id="m-premium" class="hide fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
+  <div class="card p-5 w-full max-w-md">
+    <div class="flex justify-between"><h3 class="text-xl font-bold">⭐ LessGoo Premium</h3><button onclick="closeM('premium')">✕</button></div>
+    <ul class="mt-3 space-y-2 text-sm"><li>📴 Offline sync of maps, routes & contact cards</li><li>🧑‍💼 24×7 live human travel concierge</li><li>📡 Dynamic SDRF radar alerts on your route</li><li>👨‍👩‍👧 Unlimited Guardian Shield travelers</li></ul>
+    <div class="grid grid-cols-2 gap-3 mt-4"><div class="rounded-xl bg-[#0b1426] p-3 text-center"><div class="text-2xl font-bold">₹149</div><div class="text-xs text-slate-400">per month</div></div>
+      <div class="rounded-xl bg-[#0b1426] p-3 text-center border border-emerald-500"><div class="text-2xl font-bold">₹999</div><div class="text-xs text-emerald-400">per year · save 44%</div></div></div>
+    <button class="btn btn-em w-full mt-4" onclick="subscribe()">Start 7-day free trial</button>
+  </div>
+</div>
+<div id="toast" class="hide fixed top-16 left-1/2 -translate-x-1/2 z-[60] bg-emerald-500 text-black font-semibold px-4 py-2 rounded-xl"></div>
+
+<script>
+/* ===== MOCK BACKEND DATA ===== */
+const ROUTES = {
+ 'Chandigarh|Shimla':{km:117,hrs:3.5,score:82,wx:{t:19,c:'Partly cloudy',rain:'30%'},haz:[['warn','Landslide risk (low-moderate) near Kaithlighat km 62'],['info','Heavy rain alert on 14 Sep – cleared'],['ok','NH-5 fully open, no blockages']],price:{Cab:'₹2,800',Bus:'₹260',Train:'₹470',Hotel:'₹2,100/night',Guide:'₹1,200/day'}},
+ 'Delhi|Manali':{km:540,hrs:13,score:64,wx:{t:11,c:'Rain showers',rain:'70%'},haz:[['bad','Road blockage reported near Mandi (Kiratpur–Manali)'],['warn','High landslide risk at Pandoh–Aut tunnel stretch'],['warn','Flash-flood advisory for Beas river']],price:{Cab:'₹9,500',Bus:'₹1,350',Train:'₹950 (to Chandigarh)',Hotel:'₹2,600/night',Guide:'₹1,500/day'}},
+ 'Dehradun|Mussoorie':{km:35,hrs:1.3,score:91,wx:{t:17,c:'Clear',rain:'10%'},haz:[['ok','Road clear, normal traffic'],['info','Fog likely after 6 PM']],price:{Cab:'₹900',Bus:'₹90',Train:'—',Hotel:'₹1,800/night',Guide:'₹800/day'}}
+};
+const CITIES=['Chandigarh','Delhi','Dehradun','Shimla','Manali','Mussoorie'];
+const BOOK={
+ Hotels:[['Hotel Snow View','Shimla · ⭐4.6 · verified','₹2,100'],['Riverside Retreat','Manali · ⭐4.4 · verified','₹2,600'],['Pine Nest Stay','Mussoorie · ⭐4.7 · verified','₹1,800']],
+ Cabs:[['Sedan (Dzire)','Chandigarh→Shimla · verified driver','₹2,800'],['SUV (Innova)','Delhi→Manali · verified driver','₹9,500'],['Mini hatchback','Dehradun→Mussoorie','₹900']],
+ Trains:[['Kalka–Shimla Express','Daily · 5h 30m','₹470'],['Shatabdi 12011','Delhi→Kalka · 4h','₹950'],['Toy train heritage','Kalka→Shimla · 5h','₹610']],
+ Buses:[['HRTC Volvo','Chandigarh→Shimla · 3h 45m','₹260'],['Himachal Deluxe','Delhi→Manali · 12h','₹1,350'],['Uttarakhand Roadways','Dehradun→Mussoorie','₹90']],
+ Food:[['Mall Road Thali','Shimla · 35 min delivery','₹220'],['Dhaba Combo','Highway pickup point','₹180'],['Momos & Soup','Manali · 30 min','₹150']]
+};
+const COMM=[
+ {t:'Chandigarh → Shimla in 3 days',a:'Priya K. ✔ verified',r:5,tags:'shimla chandigarh family',tip:'Leave before 8 AM to skip Kaithlighat jams. Take the toy train on the return.',road:'NH-5 smooth, minor landslide patch km 62 (cleared in 2h)'},
+ {t:'Solo Manali monsoon trip',a:'Rohit S. ✔ verified',r:4,tags:'manali solo rain landslide',tip:'Avoid Mandi stretch after 4 PM in July–Aug. Keep a paper map – network drops after Pandoh.',road:'Slow near Pandoh, one-way traffic'},
+ {t:'Mussoorie weekend with kids',a:'Neha & Amit ✔ verified',r:5,tags:'mussoorie kids family dehradun',tip:'Book hotels near Mall Road to avoid steep night drives.',road:'Clear, fog after 6 PM'},
+ {t:'Shimla–Kufri budget guide',a:'Gurpreet D. ✔ verified',r:4,tags:'shimla kufri budget',tip:'Use HRTC local buses; pre-book guide for ₹1,200/day, avoid touts.',road:'Open all day'}
+];
+const $=id=>document.getElementById(id);
+const toast=m=>{const t=$('toast');t.textContent=m;t.classList.remove('hide');setTimeout(()=>t.classList.add('hide'),2400)};
+const openM=n=>$('m-'+n).classList.remove('hide');
+const closeM=n=>{$('m-'+n).classList.add('hide');if(n==='sos'){$('sosForm').classList.remove('hide');$('sosOut').classList.add('hide')}};
+
+/* ===== 1. PLANNER ===== */
+CITIES.forEach(c=>{$('from').add(new Option(c,c));$('to').add(new Option(c,c))});
+$('from').value='Chandigarh';$('to').value='Shimla';
+$('date').value=new Date().toISOString().slice(0,10);
+function planTrip(){
+ const k=$('from').value+'|'+$('to').value, r=ROUTES[k], o=$('planOut'); o.classList.remove('hide');
+ if(!r){o.innerHTML='<div class="card p-4 lg:col-span-3">No verified data for this pair yet. Try Chandigarh→Shimla, Delhi→Manali or Dehradun→Mussoorie.</div>';return}
+ const col=r.score>80?'emerald':r.score>70?'amber':'red', ic={ok:'🟢',info:'🔵',warn:'🟠',bad:'🔴'};
+ const stale=navigator.onLine&&!$('offToggle').checked?'Live':'Cached';
+ o.innerHTML=`
+ <div class="card p-4"><div class="text-sm text-slate-400">${$('from').value} → ${$('to').value} · ${r.km} km · ~${r.hrs}h</div>
+  <div class="text-5xl font-extrabold text-${col}-400 mt-2">${r.score}<span class="text-lg text-slate-400">/100</span></div><div class="text-sm">Route safety score · ${$('who').value}</div>
+  <div class="mt-3 text-sm">🌤️ ${r.wx.t}°C, ${r.wx.c} · Rain chance ${r.wx.rain}</div>
+  ${$('who').value==='Unaccompanied minor'?'<div class="mt-3 text-xs bg-emerald-500/10 text-emerald-300 p-2 rounded-lg">Guardian Shield recommended – enable check-ins below.</div>':''}</div>
+ <div class="card p-4"><div class="font-semibold mb-2">⚠️ Hazard & road engine <span class="text-xs text-slate-400">(${stale})</span></div>
+  <ul class="space-y-2 text-sm">${r.haz.map(h=>`<li>${ic[h[0]]} ${h[1]}</li>`).join('')}</ul></div>
+ <div class="card p-4"><div class="font-semibold mb-2">💰 Transparent pricing <span class="text-xs text-slate-400">(verified · ${stale})</span></div>
+  <table class="w-full text-sm">${Object.entries(r.price).map(([a,b])=>`<tr class="border-b border-slate-800"><td class="py-1">${a}</td><td class="text-right font-semibold">${b}</td></tr>`).join('')}</table></div>`;
+}
+
+/* ===== 2. SOS ===== */
+function fireSOS(){
+ const out=$('sosOut');$('sosForm').classList.add('hide');out.classList.remove('hide');out.innerHTML='<div>📍 Acquiring GPS…</div>';
+ const send=(lat,lng)=>{
+  const type=$('sosType').value, tgt=['SDRF / NDRF control room','Nearest police station','Nearest hospital & ambulance (108)','Registered NGO responders'];
+  out.innerHTML=`<div class="text-emerald-300">📍 ${lat.toFixed(5)}, ${lng.toFixed(5)}</div><div class="text-slate-400">Incident: ${type}</div>`;
+  tgt.forEach((t,i)=>setTimeout(()=>{out.insertAdjacentHTML('beforeend',`<div>✅ Alert delivered → ${t}</div>`);
+   if(i===3)out.insertAdjacentHTML('beforeend','<div class="mt-2 p-2 rounded-lg bg-red-500/10 text-red-300">Help is being dispatched. Stay calm, move to high ground/open area, and keep your phone on. Call 112 if you can.</div>')},(i+1)*700));
+ };
+ if(navigator.geolocation)navigator.geolocation.getCurrentPosition(p=>send(p.coords.latitude,p.coords.longitude),()=>send(31.1048,77.1734),{timeout:3000});
+ else send(31.1048,77.1734);
+}
+
+/* ===== 3. GUARDIAN SHIELD ===== */
+let gTimer=null,gN=0;
+function glog(m,c){$('gLog').insertAdjacentHTML('afterbegin',`<div class="${c||''}">${new Date().toLocaleTimeString()} · ${m}</div>`)}
+function toggleGuard(){
+ if(gTimer){clearInterval(gTimer);gTimer=null;$('gBtn').textContent='Start';$('gStatus').textContent='Not tracking';$('gStatus').className='text-xs px-2 py-1 rounded-full bg-slate-700';return}
+ $('gBtn').textContent='Stop';$('gStatus').textContent='● Live tracking';$('gStatus').className='text-xs px-2 py-1 rounded-full bg-emerald-600';
+ glog('Tracking started. Parent notified.','text-emerald-300');
+ gTimer=setInterval(()=>{gN++;glog(`✅ Check-in #${gN}: Aarav is safe · near ${['Solan','Kandaghat','Shoghi','Shimla'][gN%4]} · battery ${95-gN*3}%`)},+$('gInt').value*100);
+}
+function phoneOff(){
+ if(!gTimer)toggleGuard();
+ clearInterval(gTimer);gTimer=null;$('gBtn').textContent='Start';
+ $('gStatus').textContent='⚠ Unreachable';$('gStatus').className='text-xs px-2 py-1 rounded-full bg-red-600';
+ glog('Phone unreachable. Fail-Safe Protocol activated.','text-red-400');
+ $('fsMsg').textContent='Aarav\u2019s phone is switched off. Last seen near Shoghi 14 min ago. Contact the people nearest to him:';
+ $('fsBtns').classList.remove('hide');
+}
+function callSim(n,p){toast('📞 Calling '+n+' ('+p+')')}
+
+/* ===== 5. BOOKING ===== */
+let tab='Hotels';
+function renderBook(){
+ $('tabs').innerHTML=Object.keys(BOOK).map(k=>`<button class="btn btn-ghost tab ${k===tab?'on':''}" onclick="tab='${k}';renderBook()">${k}</button>`).join('');
+ $('bookList').innerHTML=BOOK[tab].map(b=>`<div class="card p-4"><div class="font-semibold">${b[0]}</div><div class="text-sm text-slate-400">${b[1]}</div>
+  <div class="flex justify-between items-center mt-3"><span class="text-lg font-bold text-emerald-400">${b[2]}</span><button class="btn btn-em" onclick="book('${b[0]}')">Book</button></div></div>`).join('');
+}
+function book(n){toast('✅ Booked: '+n+' – confirmation sent')}
+function subscribe(){closeM('premium');toast('⭐ Premium trial activated')}
+
+/* ===== 4. COMMUNITY ===== */
+function renderComm(){
+ const q=$('q').value.toLowerCase();
+ $('comm').innerHTML=COMM.filter(c=>(c.t+c.tags+c.tip).toLowerCase().includes(q)).map(c=>`<div class="card p-4"><div class="font-semibold">${c.t}</div>
+  <div class="text-xs text-slate-400">${c.a} · ${'★'.repeat(c.r)}${'☆'.repeat(5-c.r)}</div>
+  <p class="text-sm mt-2">💡 ${c.tip}</p><p class="text-sm text-amber-300 mt-1">🛣️ ${c.road}</p></div>`).join('')||'<div class="text-slate-400">No itineraries found.</div>';
+}
+
+/* ===== 6. CHATBOT ===== */
+const KB=[
+ [/landslide/,'If caught near a landslide: move away from the slope sideways, not downhill. Avoid river channels, and alert SDRF via the SOS button.'],
+ [/flood/,'In floods: go to higher ground, avoid driving through moving water (15 cm can sweep a car), and send SOS with your location.'],
+ [/earthquake/,'Drop, cover, hold on. Stay away from windows and slopes. After shaking stops, move to an open area and expect aftershocks.'],
+ [/shimla|chandigarh/,'Chandigarh→Shimla (NH-5, 117 km) is currently open. Safety score 82. Leave early morning; watch the landslide-prone patch near km 62.'],
+ [/manali/,'Delhi→Manali is at 64/100 today due to rain and a blockage near Mandi. I\u2019d suggest delaying by a day or using the Chandigarh bus.'],
+ [/kid|child|minor|parent/,'Enable Guardian Shield for kids: check-ins every 30–60 min and a Fail-Safe with hotel and driver contacts.'],
+ [/sos|emergency|help/,'Tap the red SOS button (bottom-left). It shares your GPS with SDRF/NDRF, police, hospitals and NGOs. National emergency: 112.'],
+ [/offline|network/,'Turn on Offline Mode to access saved maps, contact cards and cached routes without network.'],
+ [/price|cost|cheap/,'All prices are verified and shown upfront. Try the planner for a full cab/bus/train/hotel/guide breakdown.']
+];
+function toggleChat(){const c=$('chat');c.classList.toggle('hide');if(!$('chatLog').children.length)bot('Hi! I\u2019m your LessGoo assistant. Ask me about routes, emergencies or safety tips.')}
+function bot(t){$('chatLog').insertAdjacentHTML('beforeend',`<div class="bg-slate-800 rounded-xl p-2 max-w-[90%]">${t}</div>`);$('chatLog').scrollTop=1e5}
+function sendChat(){
+ const v=$('chatIn').value.trim();if(!v)return;$('chatIn').value='';
+ $('chatLog').insertAdjacentHTML('beforeend',`<div class="bg-emerald-600 text-white rounded-xl p-2 max-w-[90%] ml-auto"></div>`);
+ $('chatLog').lastChild.textContent=v;
+ const hit=KB.find(k=>k[0].test(v.toLowerCase()));
+ setTimeout(()=>bot(hit?hit[1]:'I can help with routes, hazards, SOS and kid safety. Try asking "Is Manali safe today?"'),500);
+}
+
+/* ===== 7. OFFLINE MODE ===== */
+$('offToggle').onchange=e=>{
+ const on=e.target.checked;$('offBanner').classList.toggle('hide',!on);
+ $('cacheStat').textContent=on?'Using cached data':'Synced 2 min ago';
+ document.querySelectorAll('main > section').forEach(s=>{if(on&&s.id!=='offPanel'&&s.id!=='guardian')s.style.opacity=.45;else s.style.opacity=1});
+ if(!$('planOut').classList.contains('hide'))planTrip();
+ if(on)$('offPanel').scrollIntoView({behavior:'smooth'});
+};
+function syncCache(){$('offToggle').checked?toast('Go online to sync'):openM('premium')}
+
+renderBook();renderComm();
+</script>
+</body>
+</html>
